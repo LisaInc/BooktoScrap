@@ -24,7 +24,7 @@ class book:
         self.upc = ""
         self.price_including_tax = ""
         self.price_excluding_tax = ""
-        self.product_description = ""
+        self.description = ""
         self.category = ""
         self.stock = ""
         self.review_rating = ""

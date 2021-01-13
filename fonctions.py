@@ -37,17 +37,24 @@ def scrap_book(url):
     """Avec l'url du book, extrait toutes les infos."""
     request = requests.get(url)
     html = request.content
-    return BeautifulSoup(html, features="html.parser")
+    soup = BeautifulSoup(html, features="html.parser")
 
-
-def tri_info(text, url):
-    """Trie les informations, et les met dans une liste."""
     one_book = book.book()
+
     # title
+    title = soup.find("title").get_text()
+    title = title.replace("| Books to Scrape - Sandbox", "")
+    one_book.title = title
 
     # description
-    if 1:
-        pass
+    description = soup.find(attrs={"name": "description"})
+
+    if description:
+        one_book.description = (
+            str(description)
+            .replace('<meta content="\n', "")
+            .replace('\n" name="description"/>', "")
+        )
     else:
         one_book.product_description = "Sans description"
 
@@ -62,8 +69,9 @@ def tri_info(text, url):
     # etoiles
 
     # image
-
-    return book
+    # image = soup.find("div", "item active")  # .a("href")
+    # print(image)
+    return one_book
 
 
 def export(book):
