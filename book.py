@@ -1,9 +1,9 @@
-"""Class livre."""
+"""Class book."""
 
 
-class Livre:
+class book:
     """
-    Classe definissant un livre.
+    Class of a book.
 
     ->  url,
         upc,
@@ -19,7 +19,7 @@ class Livre:
 
     def __init__(self):
         """Tout les attribut du livre."""
-        self.titre = ""
+        self.title = ""
         self.url = ""
         self.upc = ""
         self.price_including_tax = ""
