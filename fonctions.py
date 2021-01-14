@@ -39,39 +39,48 @@ def scrap_book(url):
     html = request.content
     soup = BeautifulSoup(html, features="html.parser")
 
-    one_book = book.book()
+    b = book.book()
 
     # title
     title = soup.find("title").get_text()
     title = title.replace("| Books to Scrape - Sandbox", "")
-    one_book.title = title
+    b.title = title
 
     # description
     description = soup.find(attrs={"name": "description"})
 
     if description:
-        one_book.description = (
+        b.description = (
             str(description)
             .replace('<meta content="\n', "")
             .replace('\n" name="description"/>', "")
         )
     else:
-        one_book.product_description = "Sans description"
+        b.product_description = "Sans description"
 
-    # UPC
+    table = soup.find("table", {"class": "table table-striped"})
+    for row in table.find_all("tr"):
+        th = row.find("th").get_text()
+        td = row.find("td").get_text()
+        # UPC
+        if "UPC" in th:
+            b.upc = td
+        # price without tax
+        if "Price (excl. tax)" in th:
+            b.price_excluding_tax = td
+        # price with tax
+        if "Price (incl. tax)" in th:
+            b.price_including_tax = td
+        # stock
+        if "Availability" in th:
+            b.stock = td
 
-    # prix avec taxe
-
-    # prix sans taxe
-
-    # stock
-
-    # etoiles
+    # rating
 
     # image
     # image = soup.find("div", "item active")  # .a("href")
-    # print(image)
-    return one_book
+
+    return b
 
 
 def export(book):

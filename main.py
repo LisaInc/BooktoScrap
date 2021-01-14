@@ -20,7 +20,11 @@ def main():
     )
     print(
         f"{scrapyscrapscrap.title} \
-          {scrapyscrapscrap.description}"
+        {scrapyscrapscrap.description}\
+        {scrapyscrapscrap.price_excluding_tax}\
+        {scrapyscrapscrap.price_including_tax}\
+        {scrapyscrapscrap.upc}\
+        {scrapyscrapscrap.stock}"
     )
 
 
