@@ -6,7 +6,7 @@ import fonctions
 def main():
     """Main fonction."""
     url = "http://books.toscrape.com"
-
+    books = []
     urls_category = fonctions.get_url_categories(url)
     for url_category in urls_category:
         url = f"http://books.toscrape.com/{url_category}"
@@ -16,14 +16,8 @@ def main():
             url_book = f"http://books.toscrape.com/catalogue/{url_book}"
             b = fonctions.scrap_book(url_book)
             b.category = category
-            print(
-                f"{b.title} \
-                {b.price_excluding_tax}\
-                {b.price_including_tax}\
-                {b.upc}\
-                {b.stock}\
-                {b.category}"
-            )
+            books.append(b)
+    fonctions.export(books)
 
 
 if __name__ == "__main__":

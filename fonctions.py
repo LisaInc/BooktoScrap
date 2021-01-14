@@ -108,10 +108,22 @@ def scrap_book(url):
     return b
 
 
-def export(book):
+def export(b):
     """Export les donnees dans csv."""
-    with open("eggs.csv", "w", newline="") as csvfile:
-        writer = csv.writer(
-            csvfile, delimiter=" ", quotechar="|", quoting=csv.QUOTE_MINIMAL
-        )
-        writer.writerows(book)
+    with open("data.csv", "w", newline="") as csvfile:
+        fieldnames = [
+            "title",
+            "url",
+            "upc",
+            "price_including_tax",
+            "price_excluding_tax",
+            "description",
+            "category",
+            "stock",
+            "rating",
+            "image_url",
+        ]
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for i in b:
+            writer.writerow(vars(i))
