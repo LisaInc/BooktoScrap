@@ -27,5 +27,5 @@ class book:
         self.description = ""
         self.category = ""
         self.stock = ""
-        self.review_rating = ""
+        self.rating = ""
         self.image_url = ""

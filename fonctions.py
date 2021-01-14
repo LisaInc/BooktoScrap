@@ -3,6 +3,7 @@
 import csv
 from bs4 import BeautifulSoup
 import requests
+import subprocess
 
 import book
 
@@ -13,7 +14,7 @@ def get_url_categories(url):
     request = requests.get(url)
     html = request.content
     soup = BeautifulSoup(html, features="html.parser")
-    soup_category = soup.find("ul", "nav nav-list")
+    soup_category = soup.find("ul", "nav nav-list").ul
     soup_category = soup_category.find_all("li")
     for i in soup_category:
         urls.append(i.a["href"])
@@ -27,10 +28,28 @@ def get_url_books(url):
     html = request.content
     soup = BeautifulSoup(html, features="html.parser")
     soup_books = soup.find_all("article", "product_pod")
+
+    category = soup.find("h1").get_text()
+
     for i in soup_books:
-        url = i.a["href"].replace("../", "")
-        urls_books.append(url)
-    return urls_books
+        url_book = i.a["href"].replace("../", "")
+        urls_books.append(url_book)
+
+    next_page = soup.find("li", "next")
+    url = url.replace("index.html", "")
+    while next_page:
+        url_next_page = url + next_page.a["href"]
+        print(url_next_page)
+        request = requests.get(url_next_page)
+        html = request.content
+        soup = BeautifulSoup(html, features="html.parser")
+        soup_books = soup.find_all("article", "product_pod")
+        for i in soup_books:
+            url_book = i.a["href"].replace("../", "")
+            urls_books.append(url_book)
+        next_page = soup.find("li", "next")
+
+    return urls_books, category
 
 
 def scrap_book(url):
@@ -76,10 +95,16 @@ def scrap_book(url):
             b.stock = td
 
     # rating
-
+    rate = soup.find("p", {"class": "star-rating"})
+    b.rating = str(rate).split("\n")[0]
+    b.rating = b.rating.replace('<p class="star-rating ', "").replace('">', "")
     # image
-    # image = soup.find("div", "item active")  # .a("href")
-
+    image_link = soup.img["src"]
+    url = "http://books.toscrape.com/"
+    image_link = url + image_link.replace("../", "")
+    b.image_url = image_link
+    # cmd = ["wget", "-P image", image_link]
+    # subprocess.Popen(cmd).communicate()
     return b
 
 
