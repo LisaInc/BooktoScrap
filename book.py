@@ -1,7 +1,7 @@
 """Class book."""
 
 
-class book:
+class Book:
     """
     Class of a book.
 

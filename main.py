@@ -14,10 +14,10 @@ def main():
         urls_book, category = fonctions.get_url_books(url)
         for url_book in urls_book:
             url_book = f"http://books.toscrape.com/catalogue/{url_book}"
-            b = fonctions.scrap_book(url_book)
-            b.category = category
-            books.append(b)
-    fonctions.export(books)
+            book = fonctions.scrap_book(url_book)
+            book.category = category
+            books.append(book)
+        fonctions.export(books, category)
 
 
 if __name__ == "__main__":

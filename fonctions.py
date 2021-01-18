@@ -5,10 +5,10 @@ from bs4 import BeautifulSoup
 import requests
 import subprocess
 
-import book
+from book import Book
 
 
-def get_url_categories(url):
+def get_url_categories(url: str) -> list:
     """Retrun a list of the categories's urls."""
     urls = []
     request = requests.get(url)
@@ -58,24 +58,34 @@ def scrap_book(url):
     html = request.content
     soup = BeautifulSoup(html, features="html.parser")
 
-    b = book.book()
+    book = Book()
 
     # title
     title = soup.find("title").get_text()
-    title = title.replace("| Books to Scrape - Sandbox", "")
-    b.title = title
+    title = (
+        title.replace(
+            "| Books to Scrape - Sandbox",
+            "",
+        )
+        .replace("\n", "")
+        .replace("  ", "")
+    )
+    book.title = title
+
+    # url
+    book.url = url
 
     # description
     description = soup.find(attrs={"name": "description"})
 
     if description:
-        b.description = (
+        book.description = (
             str(description)
             .replace('<meta content="\n', "")
             .replace('\n" name="description"/>', "")
         )
     else:
-        b.product_description = "Sans description"
+        book.product_description = "Sans description"
 
     table = soup.find("table", {"class": "table table-striped"})
     for row in table.find_all("tr"):
@@ -83,47 +93,38 @@ def scrap_book(url):
         td = row.find("td").get_text()
         # UPC
         if "UPC" in th:
-            b.upc = td
+            book.upc = td
         # price without tax
         if "Price (excl. tax)" in th:
-            b.price_excluding_tax = td
+            book.price_excluding_tax = td
         # price with tax
         if "Price (incl. tax)" in th:
-            b.price_including_tax = td
+            book.price_including_tax = td
         # stock
         if "Availability" in th:
-            b.stock = td
+            book.stock = td
 
     # rating
     rate = soup.find("p", {"class": "star-rating"})
-    b.rating = str(rate).split("\n")[0]
-    b.rating = b.rating.replace('<p class="star-rating ', "").replace('">', "")
+    book.rating = str(rate).split("\n")[0]
+    book.rating = book.rating.replace('<p class="star-rating ', "").replace('">', "")
+
     # image
     image_link = soup.img["src"]
     url = "http://books.toscrape.com/"
     image_link = url + image_link.replace("../", "")
-    b.image_url = image_link
-    # cmd = ["wget", "-P image", image_link]
-    # subprocess.Popen(cmd).communicate()
-    return b
+    book.image_url = image_link
+    vvv = book.title
+    cmd = ["curl", f"""-o image/{vvv}.jpg""", image_link]
+    subprocess.Popen(cmd).communicate()
+
+    return book
 
 
-def export(b):
+def export(books, category):
     """Export les donnees dans csv."""
-    with open("data.csv", "w", newline="") as csvfile:
-        fieldnames = [
-            "title",
-            "url",
-            "upc",
-            "price_including_tax",
-            "price_excluding_tax",
-            "description",
-            "category",
-            "stock",
-            "rating",
-            "image_url",
-        ]
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    with open(f"csv/{category}.csv", "w", newline="") as csvfile:  # a+
+        writer = csv.DictWriter(csvfile, fieldnames=list(vars(books[0]).keys()))
         writer.writeheader()
-        for i in b:
-            writer.writerow(vars(i))
+        for book in books:
+            writer.writerow(vars(book))
