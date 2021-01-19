@@ -114,8 +114,8 @@ def scrap_book(url):
     url = "http://books.toscrape.com/"
     image_link = url + image_link.replace("../", "")
     book.image_url = image_link
-    vvv = book.title
-    cmd = ["curl", f"""-o image/{vvv}.jpg""", image_link]
+    name = book.title.replace("\\", " ").replace("/", " ").replace(" ", "_")
+    cmd = ["curl", f"""-o image/{name}.jpg""", image_link]
     subprocess.Popen(cmd).communicate()
 
     return book
