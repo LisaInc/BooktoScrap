@@ -2,3 +2,6 @@
 __pycache__
 .vscode
 plan.txt
+csv
+image
+.gitignore

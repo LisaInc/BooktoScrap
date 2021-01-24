@@ -39,7 +39,6 @@ def get_url_books(url):
     url = url.replace("index.html", "")
     while next_page:
         url_next_page = url + next_page.a["href"]
-        print(url_next_page)
         request = requests.get(url_next_page)
         html = request.content
         soup = BeautifulSoup(html, features="html.parser")
@@ -81,9 +80,13 @@ def scrap_book(url):
     if description:
         book.description = (
             str(description)
-            .replace('<meta content="\n', "")
-            .replace('\n" name="description"/>', "")
+            .replace('<meta content="', "")
+            .replace("<meta content='", "")
+            .replace('" name="description"/>', "")
+            .replace('\' name="description"/>', "")
+            .replace("\n", "")
         )
+
     else:
         book.product_description = "Sans description"
 
@@ -114,9 +117,13 @@ def scrap_book(url):
     url = "http://books.toscrape.com/"
     image_link = url + image_link.replace("../", "")
     book.image_url = image_link
-    name = book.title.replace("\\", " ").replace("/", " ").replace(" ", "_")
-    cmd = ["curl", f"""-o image/{name}.jpg""", image_link]
-    subprocess.Popen(cmd).communicate()
+    name = (
+        "image/"
+        + book.title.replace("\\", " ").replace("/", " ").replace(" ", "_")
+        + ".jpg"
+    )
+    cmd = ["curl", "-o" + name, image_link]
+    subprocess.Popen(cmd)
 
     return book
 
